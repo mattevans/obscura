@@ -1,0 +1,6 @@
+The web server is reachable at <<IP>>192.168.1.1<<>> from inside the VPN only.
+A second node lives on <<IP>>10.0.0.5<<>> and serves the internal API.
+The gateway logged traffic from <<IP>>203.0.113.42<<>> during the incident window.
+Our IPv6 dual-stack endpoint is <<IP>>2001:0db8:85a3:0000:0000:8a2e:0370:7334<<>> for testing.
+The faulty NIC reported MAC <<MAC>>00:1A:2B:3C:4D:5E<<>> in the switch logs.
+A second interface showed <<MAC>>DE-AD-BE-EF-00-01<<>> after the firmware update.

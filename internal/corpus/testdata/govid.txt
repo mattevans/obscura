@@ -1,0 +1,5 @@
+The applicant's SSN <<GOV_ID>>123-45-6789<<>> is on the verification form.
+For the US hire we recorded social security number <<GOV_ID>>078-05-1120<<>> from the I-9.
+The UK contractor's National Insurance number is <<GOV_ID>>AB123456C<<>> per HMRC records.
+Another UK staff member listed NINO <<GOV_ID>>JG 12 34 56 D<<>> on the starter checklist.
+The Australian employee provided tax file number <<GOV_ID>>123 456 782<<>> at onboarding.

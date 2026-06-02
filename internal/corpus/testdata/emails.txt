@@ -1,0 +1,5 @@
+Please email <<EMAIL>>jane.doe@example.com<<>> with the signed contract by Friday.
+Cc <<EMAIL>>a.contractor+billing@sub.example.co.uk<<>> so accounts has a copy.
+For escalations write to <<EMAIL>>ops-team@acme.io<<>> and they will triage within an hour.
+The address <<EMAIL>>support_desk@corp-internal.example<<>> was bouncing, so use <<EMAIL>>support_desk@corp-internal.example<<>> only after the migration.
+Two recruiters reached out: <<EMAIL>>r1@talent.example<<>> and <<EMAIL>>r2@talent.example<<>> on the same day.

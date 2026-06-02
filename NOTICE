@@ -1,0 +1,20 @@
+obscura
+Copyright (c) 2026 Matt Evans
+
+This product includes third-party material under permissive licenses:
+
+GPT-2 byte-pair-encoding merge ranks
+------------------------------------
+File: secret/tokenfilter/bpe/merges.txt.gz
+Source: OpenAI GPT-2 (https://github.com/openai/gpt-2)
+License: MIT
+
+Only the merge ranks are embedded, and they are used solely to count tokens
+for the secret token-efficiency filter. No model weights are included.
+
+Secret-detection rule patterns
+------------------------------
+The regular-expression patterns in secret/rules.go are derived from publicly
+documented credential formats. Where format conventions follow community
+secret-scanning rule sets (e.g. gitleaks / betterleaks, MIT-licensed), those
+projects are gratefully acknowledged. No rule files were copied verbatim.

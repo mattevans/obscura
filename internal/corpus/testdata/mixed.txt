@@ -1,0 +1,11 @@
+Subject: Account locked after payment failure
+
+Hi team, the customer <<EMAIL>>maria.gomez@example.com<<>> (phone <<PHONE>>+1 415 555 0143<<>>) says her
+card <<CREDIT_CARD>>5105 1051 0510 5100<<>> keeps getting declined even though the bank confirmed funds.
+She tried from <<IP>>198.51.100.23<<>> and again from the office at <<IP>>192.168.10.4<<>>.
+
+For the refund she gave IBAN <<IBAN>>DE89370400440532013000<<>>. Please do not log her SSN
+<<GOV_ID>>123-45-6789<<>> anywhere in plaintext.
+
+Also, our intern accidentally committed the production key <<SECRET>>AKIAIOSFODNN7EXAMPLE<<>> to the
+public repo this morning, so that needs rotating regardless of this ticket. Thanks.

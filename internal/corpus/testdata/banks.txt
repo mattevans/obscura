@@ -1,0 +1,5 @@
+Wire the deposit to IBAN <<IBAN>>GB82WEST12345698765432<<>> referencing the invoice number.
+The German supplier uses <<IBAN>>DE89370400440532013000<<>> for euro settlements.
+Their French account is <<IBAN>>FR1420041010050500013M02606<<>> per the onboarding pack.
+For US ACH the routing number is <<ROUTING>>021000021<<>> and the account follows.
+Payroll runs through routing <<ROUTING>>121000248<<>> at the West-coast branch.

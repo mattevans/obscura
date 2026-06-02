@@ -1,0 +1,5 @@
+The charge went through on Visa <<CREDIT_CARD>>4111 1111 1111 1111<<>> last Tuesday.
+A second card <<CREDIT_CARD>>4012 8888 8888 1881<<>> was declined by the issuer.
+Mastercard <<CREDIT_CARD>>5555 5555 5555 4444<<>> is the one on file for the subscription.
+The Amex ending in 0005, full number <<CREDIT_CARD>>3782 822463 10005<<>>, needs reverification.
+Refund the Discover card <<CREDIT_CARD>>6011 0009 9013 9424<<>> for the duplicate order.
