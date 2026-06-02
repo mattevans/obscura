@@ -1,0 +1,17 @@
+The web server is reachable at <<IP>>192.168.1.1<<>> from inside the VPN only.
+A second node lives on <<IP>>10.0.0.5<<>> and serves the internal API.
+The gateway logged traffic from <<IP>>203.0.113.42<<>> during the incident window.
+The load balancer sits at <<IP>>192.168.100.5<<>> behind the firewall.
+The default route uses the netmask <<IP>>255.255.255.0<<>> on that subnet.
+A public resolver is <<IP>>8.8.8.8<<>> for quick DNS checks.
+The DMZ host answers on <<IP>>198.51.100.23<<>> for external monitors.
+Our IPv6 dual-stack endpoint is <<IP>>2001:0db8:85a3:0000:0000:8a2e:0370:7334<<>> for testing.
+A second IPv6 address <<IP>>fe80:0000:0000:0000:0202:b3ff:fe1e:8329<<>> appears in the neighbour table.
+The loopback <<IP>>::1<<>> is used by the health check.
+The faulty NIC reported MAC <<MAC>>00:1A:2B:3C:4D:5E<<>> in the switch logs.
+A second interface showed <<MAC>>DE-AD-BE-EF-00-01<<>> after the firmware update.
+A third adapter reported <<MAC>>a8:bb:cc:dd:ee:ff<<>> on the management VLAN.
+Uptime held at 99.99% across 365 days without an unplanned restart.
+The aspect ratio 16:9 and the split 16:9:1 are layout settings, not addresses.
+London sits near coordinates 51.5074, -0.1278 on the map tiles.
+The cron window 12:34:56 is a timestamp and must not read as an address.
