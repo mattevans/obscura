@@ -9,3 +9,15 @@ For the refund she gave IBAN <<IBAN>>DE89370400440532013000<<>>. Please do not l
 
 Also, our intern accidentally committed the production key <<SECRET>>AKIAIOSFODNN7EXAMPLE<<>> to the
 public repo this morning, so that needs rotating regardless of this ticket. Thanks.
+
+---
+
+Subject: Vendor onboarding for the Sydney office
+
+The new supplier emails from <<EMAIL>>accounts@vendor.example<<>> and lists ABN
+<<BUSINESS_ID>>30 164 696 039<<>> on the W-8. Their accounts line is <<PHONE>>(02) 9374 4000<<>> and the
+remittance IBAN is <<IBAN>>GB82WEST12345698765432<<>>. The portal admin shared a Stripe key
+<<SECRET>>sk_live_4eC39HqLyjWDarjtT1zdp7dc<<>> in chat, which we have since revoked.
+
+For context the order reference was 100245, the build was 4.2.1, and the call happened at 14:30:00
+UTC — none of those should be treated as identifiers.

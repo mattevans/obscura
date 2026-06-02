@@ -91,10 +91,13 @@ func defaultPriority() map[Kind]int {
 		KindEmail:      70,
 		// GovID outranks Phone so a checksum-validated national ID (e.g. an AU TFN written as
 		// three spaced groups) is not shadowed by the deliberately loose phone matcher.
-		KindGovID:     65,
+		KindGovID: 65,
+		// IPAddress and MAC outrank Phone: an octet-validated dotted-quad (e.g. 255.255.255.0)
+		// or a hardware address is far more specific than the loose grouped-phone pattern, which
+		// would otherwise clip the first three octets of an IP as a phone number.
+		KindIPAddress: 63,
+		KindMAC:       62,
 		KindPhone:     60,
-		KindMAC:       55,
-		KindIPAddress: 40,
 		KindInjection: 30,
 		KindPerson:    20,
 		KindLocation:  15,

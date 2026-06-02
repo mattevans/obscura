@@ -1,5 +1,10 @@
 The applicant's SSN <<GOV_ID>>123-45-6789<<>> is on the verification form.
 For the US hire we recorded social security number <<GOV_ID>>078-05-1120<<>> from the I-9.
+A second US contractor listed SSN <<GOV_ID>>536-90-4399<<>> on the W-9.
 The UK contractor's National Insurance number is <<GOV_ID>>AB123456C<<>> per HMRC records.
 Another UK staff member listed NINO <<GOV_ID>>JG 12 34 56 D<<>> on the starter checklist.
 The Australian employee provided tax file number <<GOV_ID>>123 456 782<<>> at onboarding.
+A second Australian hire gave TFN <<GOV_ID>>876 543 210<<>> on the declaration form.
+The HR badge number 7782 and the desk code 4456 are internal references only.
+Employee record E-4456-K tracks the onboarding paperwork, not a government identifier.
+The case file numbered 12-3456 is an internal ticket, not a social security number.

@@ -1,7 +1,12 @@
 Our supplier's ABN is <<BUSINESS_ID>>30 164 696 039<<>> on the latest tax invoice.
 The tax office lists its own ABN as <<BUSINESS_ID>>51 824 753 556<<>> for written correspondence.
 We also keep the unspaced form <<BUSINESS_ID>>51824753556<<>> in the vendor master record.
+A second supplier trades under ABN <<BUSINESS_ID>>53 004 085 616<<>> on its quotes.
+The freight company's ABN is <<BUSINESS_ID>>33 051 775 556<<>> per the consignment note.
 The New Zealand entity trades under NZBN <<BUSINESS_ID>>9429048825658<<>> per the companies register.
+A second NZ supplier lists NZBN <<BUSINESS_ID>>9429036021116<<>> on its purchase orders.
 A mistyped ABN 30 164 696 038 must be rejected by the checksum rather than redacted.
+Another invalid ABN 11 008 486 538 fails the mod-89 check and must be left alone.
 The reference 12345678901 is an internal SKU and is not a business number at all.
 Lot code 1234567890123 was generated in-house and is not a valid NZBN.
+The asset tag 9429036021110 looks like an NZBN but its check digit is wrong.

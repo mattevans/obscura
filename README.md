@@ -93,11 +93,13 @@ who don't enable it never compile or embed the data.
 
 obscura ships a labelled corpus and a precision/recall harness, and the numbers below are
 regenerated from it — not hand-waved. Run `go test -run AccuracyReport -v` to reproduce them,
-and `TestAccuracyFloor` is a CI gate that fails the build if accuracy regresses. The corpus
-deliberately includes adversarial cases so the numbers are earned rather than flattering:
-timestamps, UUIDs, git SHAs, version strings, a Luhn-*invalid* card, checksum-failing ABNs, and
-11/13-digit runs that are structurally identical to a business number or a phone number but are
-neither. You can read every fixture under `internal/corpus/testdata/`.
+and `TestAccuracyFloor` is a CI gate that fails the build if accuracy regresses. Roughly a third
+of the corpus is adversarial negatives, so the numbers are earned rather than flattering:
+timestamps and clock times, UUIDs, git SHAs and a SHA-256 digest, semantic-version strings, an
+ISBN-13, RGB triples and coordinates, a Luhn-*invalid* card, checksum-failing ABNs and IBANs,
+9/11/13-digit runs that are structurally identical to a routing/business number but fail their
+checksum, and a netmask (`255.255.255.0`) that is also a valid grouped-phone shape. You can read
+every fixture under `internal/corpus/testdata/`.
 
 Recommended config (`pii.All()` + default secret ruleset + BPE filter), relaxed span match:
 
@@ -109,7 +111,7 @@ Recommended config (`pii.All()` + default secret ruleset + BPE filter), relaxed 
 | routing | 100% | 100% | phone | 100% | 100% |
 | IP | 100% | 100% | secret | 100% | 100% |
 | MAC | 100% | 100% | | | |
-| **Overall** | **100%** | **100%** | (56 spans, 11 docs) | | |
+| **Overall** | **100%** | **100%** | (102 spans, 11 docs) | | |
 
 What this number does and does not mean: every detected kind is validated by a real checksum
 (Luhn, IBAN mod-97, ABA, ABN mod-89, NZBN EAN-13, TFN mod-11) or a strict structural pattern,

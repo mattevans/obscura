@@ -68,7 +68,7 @@ func TestAccuracyFloor(t *testing.T) {
 	res, _ := scoreCorpus(t, accuracyScrubber())
 
 	const (
-		minOverallPrecision = 0.95
+		minOverallPrecision = 0.97
 		minOverallRecall    = 0.97
 	)
 

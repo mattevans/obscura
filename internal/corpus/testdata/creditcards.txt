@@ -3,3 +3,12 @@ A second card <<CREDIT_CARD>>4012 8888 8888 1881<<>> was declined by the issuer.
 Mastercard <<CREDIT_CARD>>5555 5555 5555 4444<<>> is the one on file for the subscription.
 The Amex ending in 0005, full number <<CREDIT_CARD>>3782 822463 10005<<>>, needs reverification.
 Refund the Discover card <<CREDIT_CARD>>6011 0009 9013 9424<<>> for the duplicate order.
+The hyphenated card <<CREDIT_CARD>>4263-9826-4026-9299<<>> is the corporate one.
+A contiguous Mastercard <<CREDIT_CARD>>5200828282828210<<>> is stored without spaces.
+The new 2-series card <<CREDIT_CARD>>2223 0031 2200 3222<<>> was issued this quarter.
+A JCB card <<CREDIT_CARD>>3530 1113 3330 0000<<>> was added for the Tokyo office.
+The Diners card <<CREDIT_CARD>>30569309025904<<>> covers travel bookings.
+A 13-digit legacy Visa <<CREDIT_CARD>>4222 2222 2222 2<<>> still appears in old records.
+A test card 4111 1111 1111 1112 was used in staging; the check digit is wrong on purpose.
+Order line 1234 5678 9012 3456 is a placeholder and fails the Luhn check.
+The product SKU is SKU-9783-1614 and ships in the spring catalogue.

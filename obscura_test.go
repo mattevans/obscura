@@ -41,6 +41,18 @@ func TestBusinessIDAndOverlapResolution(t *testing.T) {
 	}
 }
 
+func TestIPv4OutranksPhoneOnOverlap(t *testing.T) {
+	// A dotted-quad whose first three octets are each three digits (a netmask, a 192.168.100.x
+	// host) is also a valid grouped-phone shape. The octet-validated IP must win the overlap so
+	// it is not clipped and mislabelled as a phone number.
+	s := newTestScrubber(t)
+	for _, in := range []string{"netmask 255.255.255.0 today", "host 192.168.100.5 online"} {
+		fs := s.Findings(in)
+		require.Len(t, fs, 1, in)
+		assert.Equal(t, obscura.KindIPAddress, fs[0].Kind, in)
+	}
+}
+
 func TestMalformedNumbersAreNotRedacted(t *testing.T) {
 	s := newTestScrubber(t)
 	// A checksum-failing ABN must not slip through as a phone number, and bare digit runs that

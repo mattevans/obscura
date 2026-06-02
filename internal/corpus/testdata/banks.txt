@@ -1,5 +1,15 @@
 Wire the deposit to IBAN <<IBAN>>GB82WEST12345698765432<<>> referencing the invoice number.
 The German supplier uses <<IBAN>>DE89370400440532013000<<>> for euro settlements.
 Their French account is <<IBAN>>FR1420041010050500013M02606<<>> per the onboarding pack.
+The Dutch entity banks with <<IBAN>>NL91ABNA0417164300<<>> for direct debits.
+Their Spanish subsidiary uses <<IBAN>>ES9121000418450200051332<<>> for payroll.
+The Swiss account on file is <<IBAN>>CH9300762011623852957<<>> for treasury sweeps.
+A short Belgian IBAN <<IBAN>>BE68539007547034<<>> is used for the local office.
+The Irish account is <<IBAN>>IE29AIBK93115212345678<<>> for the Dublin team.
 For US ACH the routing number is <<ROUTING>>021000021<<>> and the account follows.
 Payroll runs through routing <<ROUTING>>121000248<<>> at the West-coast branch.
+The Midwest branch uses ABA <<ROUTING>>011401533<<>> for incoming wires.
+Reconcile against routing <<ROUTING>>026009593<<>> for the East-coast accounts.
+A mistyped IBAN GB00WEST12345698765432 must be rejected by the mod-97 check, not redacted.
+The internal ledger code 123456789 is not a routing number and fails the ABA checksum.
+Our purchase-order sequence reached 999999999 this year but it is not a bank identifier.

@@ -3,3 +3,13 @@ Cc <<EMAIL>>a.contractor+billing@sub.example.co.uk<<>> so accounts has a copy.
 For escalations write to <<EMAIL>>ops-team@acme.io<<>> and they will triage within an hour.
 The address <<EMAIL>>support_desk@corp-internal.example<<>> was bouncing, so use <<EMAIL>>support_desk@corp-internal.example<<>> only after the migration.
 Two recruiters reached out: <<EMAIL>>r1@talent.example<<>> and <<EMAIL>>r2@talent.example<<>> on the same day.
+Legal prefers the long form <<EMAIL>>first.last@example.museum<<>> for archived correspondence.
+The shared inbox <<EMAIL>>CAPS.USER@EXAMPLE.COM<<>> is read by the whole on-call rotation.
+Marketing sends from <<EMAIL>>user+newsletter@mail-server.co<<>> on the first of the month.
+Even the odd-looking <<EMAIL>>7days@weather-bot.io<<>> mailbox is monitored by the bot team.
+A trailing period should not be eaten: contact <<EMAIL>>billing@vendor.example<<>>. Thanks.
+Please ping @marketing or @sales in the channel rather than emailing the whole list.
+The load average briefly hit 50@100 nodes during the incident but recovered on its own.
+See the entry HEAD@{0} in the reflog if you need to recover the dropped commit.
+If the gateway is down, write to jane(at)example(dot)com and we will follow up by phone.
+The npm scope @acme/client and the handle @jane_doe are not email addresses.

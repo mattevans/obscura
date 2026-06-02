@@ -3,3 +3,8 @@ The treasury multisig is <<CRYPTO_ADDR>>0xde709f2102306220921060314715629080e2fb
 Donations go to the Bitcoin address <<CRYPTO_ADDR>>1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa<<>> from the genesis block.
 A bech32 wallet <<CRYPTO_ADDR>>bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq<<>> received the staking reward.
 The P2SH address <<CRYPTO_ADDR>>3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy<<>> holds the cold storage funds.
+A second legacy address <<CRYPTO_ADDR>>1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2<<>> is in the archive.
+The contract owner is <<CRYPTO_ADDR>>0x742d35Cc6634C0532925a3b844Bc454e4438f44e<<>> per the deploy log.
+The commit hash 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b is forty hex chars but not an address.
+The short hex value 0xCAFEBABE is a marker, not a twenty-byte Ethereum address.
+The transaction id 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b is not an address.

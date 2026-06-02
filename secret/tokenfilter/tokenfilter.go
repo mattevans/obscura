@@ -12,6 +12,7 @@
 package tokenfilter
 
 import (
+	"strings"
 	"unicode/utf8"
 
 	"github.com/mattevans/obscura"
@@ -71,6 +72,13 @@ func (f *Filter) Name() string { return "secret:token-efficiency" }
 // fragment heavily under BPE. Non-secret or too-short candidates pass through unchanged.
 func (f *Filter) Apply(m obscura.Match, _ obscura.FilterContext) (float64, bool) {
 	if m.Kind != obscura.KindSecret || len(m.Value) < f.minLen {
+		return m.Score, true
+	}
+	// The chars-per-token ratio is calibrated for a single contiguous credential token. A value
+	// containing whitespace is a multi-word structural marker (e.g. a "-----BEGIN RSA PRIVATE
+	// KEY-----" header) that a specific rule matched on purpose, not prose masquerading as a key,
+	// so the natural-language heuristic does not apply.
+	if strings.ContainsAny(m.Value, " \t\r\n") {
 		return m.Score, true
 	}
 	n := f.enc.CountTokens(m.Value)

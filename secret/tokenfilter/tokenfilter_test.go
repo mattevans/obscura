@@ -34,6 +34,21 @@ func TestKeepsAndBumpsRealSecret(t *testing.T) {
 	assert.Greater(t, score, 0.8, "score should be bumped for secret-like fragmentation")
 }
 
+func TestKeepsWhitespaceMarker(t *testing.T) {
+	// A multi-word structural marker (a PEM header) tokenizes like prose, but it is a
+	// high-signal secret a specific rule matched on purpose. The whitespace guard must keep it
+	// rather than mistaking it for a natural-language false positive.
+	f := tokenfilter.New()
+	m := obscura.Match{
+		Kind:  obscura.KindSecret,
+		Value: "-----BEGIN RSA PRIVATE KEY-----",
+		Score: 0.75,
+	}
+	score, keep := f.Apply(m, obscura.FilterContext{})
+	assert.True(t, keep, "a whitespace-bearing structural secret must not be vetoed")
+	assert.Equal(t, 0.75, score, "score is unchanged for a whitespace-bearing marker")
+}
+
 func TestPassesThroughNonSecret(t *testing.T) {
 	f := tokenfilter.New()
 	m := obscura.Match{Kind: obscura.KindEmail, Value: "thequickbrownfoxjumps@x.com", Score: 0.9}
