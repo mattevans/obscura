@@ -1,0 +1,13 @@
+# Test binaries and coverage output of the go tooling.
+*.test
+*.out
+coverage.txt
+
+# Go workspace files a user may have created.
+go.work
+go.work.sum
+
+# Editor and OS cruft.
+.vscode/
+.idea/
+.DS_Store

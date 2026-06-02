@@ -209,6 +209,31 @@ type Detector interface {
 }
 ```
 
+## Examples
+
+Runnable programs live in [`examples/`](examples/):
+
+- [`examples/showcase`](examples/showcase) — an offline, zero-setup tour that redacts and restores
+  one value for every kind obscura detects. No API key, no network. Run `go run ./examples/showcase`:
+
+  ```
+  email             ping john@acme.com         →  ping ⟦EMAIL_1⟧
+  credit card       card 4111 1111 1111 1111   →  card ⟦CREDIT_CARD_1⟧
+  routing (UK)      sort code 09-01-28         →  sort code ⟦ROUTING_1⟧
+  gov-id (NZ IRD)   ird 49091850               →  ird ⟦GOV_ID_1⟧
+  secret (AWS key)  key AKIA…EXAMPLE           →  key ⟦SECRET_1⟧
+  ```
+
+  The full table is pinned in `testdata/showcase.golden` and verified by a test, so detection
+  drift fails CI.
+
+- [`examples/openrouter`](examples/openrouter) — the same flow end-to-end against a live LLM through
+  the HTTP transport, printing exactly what crosses the wire. Needs an OpenAI-compatible key:
+  `OPENROUTER_API_KEY=… go run ./examples/openrouter`.
+
+Short, copy-pasteable snippets also render on
+[pkg.go.dev](https://pkg.go.dev/github.com/mattevans/obscura#example-Scrubber.Redact).
+
 ## Non-goals
 
 - No accurate name/address detection from regex (that's the optional NER tier).

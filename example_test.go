@@ -23,3 +23,14 @@ func ExampleScrubber_Redact() {
 	// Email ⟦EMAIL_1⟧ about invoice ⟦CREDIT_CARD_1⟧.
 	// I'll email jane@example.com now.
 }
+
+// Within one call the same value always maps to the same placeholder, so the model sees a
+// consistent entity and restoration is unambiguous.
+func ExampleScrubber_Redact_stablePlaceholders() {
+	s := obscura.New(obscura.WithDetectors(pii.All()...))
+
+	clean, _ := s.Redact("from a@x.com to b@x.com, cc a@x.com")
+	fmt.Println(clean)
+	// Output:
+	// from ⟦EMAIL_1⟧ to ⟦EMAIL_2⟧, cc ⟦EMAIL_1⟧
+}
