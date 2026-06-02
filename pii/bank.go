@@ -1,39 +1,31 @@
 package pii
 
 import (
-	"regexp"
-
 	"github.com/mattevans/obscura"
 )
 
-var (
-	// ibanRegex matches the structural shape of an IBAN: two-letter country code, two check
-	// digits, then up to 30 alphanumerics. The mod-97 checksum filter validates it.
-	ibanRegex = regexp.MustCompile(`\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b`)
-	// abaRegex matches any nine-digit run; the ABA weighted checksum filter rejects non-routing
-	// numbers, which removes the vast majority of false positives.
-	abaRegex = regexp.MustCompile(`\b\d{9}\b`)
-)
+// Bank detects bank routing and account identifiers: the jurisdiction-agnostic IBAN, plus
+// domestic routing codes — US ABA routing number, UK sort code, AU BSB, and NZ bank account.
+// The rules live in the per-locale files (locale_*.go); WithLocales selects which domestic codes
+// are active, while IBAN (which carries its own country code) is always recognised.
+type Bank struct {
+	rules []localeRule
+}
 
-// Bank detects bank account identifiers: IBANs and US ABA routing numbers.
-type Bank struct{}
-
-// NewBank returns a bank-identifier detector.
-func NewBank() obscura.Detector { return Bank{} }
+// NewBank returns a bank-identifier detector. With no options every supported jurisdiction is
+// recognised; pass WithLocales to narrow the domestic codes.
+func NewBank(opts ...Option) obscura.Detector {
+	rules := rulesForKinds(obscura.KindIBAN, obscura.KindRouting)
+	return Bank{rules: selectRules(rules, newLocaleConfig(opts))}
+}
 
 // Name identifies the detector.
 func (Bank) Name() string { return "pii:bank" }
 
-// Detect returns candidate IBANs and ABA routing numbers found in text.
-func (Bank) Detect(text string) []obscura.Match {
-	matches := findMatches(ibanRegex, text, obscura.KindIBAN, 0.8, "pii:iban")
-	matches = append(matches, findMatches(abaRegex, text, obscura.KindRouting, 0.55, "pii:aba")...)
-	return matches
-}
-
-// DefaultFilters asks the Scrubber to validate IBAN mod-97 and ABA weighted checksums.
-func (Bank) DefaultFilters() []obscura.Filter {
-	return []obscura.Filter{obscura.NewChecksumFilter()}
+// Detect returns candidate bank identifiers. Checksummed kinds (IBAN, ABA) are validated during
+// detection; unchecksummed domestic codes (sort code, BSB, NZ account) are gated on a nearby cue.
+func (b Bank) Detect(text string) []obscura.Match {
+	return detectRules(b.rules, text)
 }
 
 var _ obscura.Detector = Bank{}

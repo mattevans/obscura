@@ -7,6 +7,8 @@ The New York desk is <<PHONE>>212-555-0188<<>> during business hours.
 Try the alternate line <<PHONE>>+1 415 555 0143<<>> if the main number is busy.
 Reception in the other building is <<PHONE>>020 7946 0958<<>> on weekdays.
 The driver's mobile is <<PHONE>>0412 345 678<<>> for delivery questions.
+The Auckland office is <<PHONE>>(09) 123 4567<<>> during business hours.
+Text the New Zealand courier on <<PHONE>>021 234 5678<<>> with any questions.
 We shipped version 4.2.1 and bumped the build number to 19041 last night.
 The banner uses the RGB triple 255 128 64 across both themes.
 Stand-up is at 9:30 and the retro is in room 204 on level 3.

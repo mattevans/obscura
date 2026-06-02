@@ -1,46 +1,36 @@
 package pii
 
 import (
-	"regexp"
-
 	"github.com/mattevans/obscura"
 )
 
-var (
-	// ssnRegex matches US Social Security Numbers in the canonical dashed form.
-	ssnRegex = regexp.MustCompile(`\b\d{3}-\d{2}-\d{4}\b`)
-	// ninoRegex matches UK National Insurance numbers (two prefix letters, six digits, a suffix
-	// letter), allowing an optional space grouping.
-	ninoRegex = regexp.MustCompile(`\b[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z] ?\d{2} ?\d{2} ?\d{2} ?[A-D]\b`)
-	// tfnRegex matches Australian Tax File Numbers written as three spaced groups of three.
-	tfnRegex = regexp.MustCompile(`\b\d{3} \d{3} \d{3}\b`)
-)
+// GovID detects government-issued identity numbers across jurisdictions: US SSN, UK NINO,
+// AU TFN, and NZ IRD. The rules themselves live in the per-locale files (locale_*.go); which
+// jurisdictions are active is controlled by WithLocales.
+type GovID struct {
+	rules []localeRule
+}
 
-// GovID detects government-issued identity numbers: US SSN, UK NINO, and AU TFN.
-type GovID struct{}
-
-// NewGovID returns a government-ID detector.
-func NewGovID() obscura.Detector { return GovID{} }
+// NewGovID returns a government-ID detector. With no options every supported jurisdiction is
+// recognised; pass WithLocales to narrow it.
+func NewGovID(opts ...Option) obscura.Detector {
+	return GovID{rules: selectRules(rulesForKinds(obscura.KindGovID), newLocaleConfig(opts))}
+}
 
 // Name identifies the detector.
 func (GovID) Name() string { return "pii:gov-id" }
 
-// Detect returns candidate government IDs found in text.
-func (GovID) Detect(text string) []obscura.Match {
-	matches := findMatches(ssnRegex, text, obscura.KindGovID, 0.7, "pii:ssn")
-	matches = append(matches, findMatches(ninoRegex, text, obscura.KindGovID, 0.7, "pii:nino")...)
-	matches = append(matches, findMatches(tfnRegex, text, obscura.KindGovID, 0.55, "pii:tfn")...)
-	return matches
+// Detect returns candidate government IDs found in text, each validated and cue-gated per its
+// jurisdiction's rule.
+func (g GovID) Detect(text string) []obscura.Match {
+	return detectRules(g.rules, text)
 }
 
 // DefaultFilters uses nearby cue words (e.g. "ssn", "tax file") to lift confidence on these
-// otherwise ambiguous numeric identifiers, and validates the Australian TFN checksum so a
-// genuine TFN is confirmed rather than left looking like a loosely-matched phone number.
+// otherwise ambiguous numeric identifiers. Checksum validation (AU TFN, NZ IRD) and cue-gating
+// happen during detection, so no checksum filter is required here.
 func (GovID) DefaultFilters() []obscura.Filter {
-	return []obscura.Filter{
-		obscura.NewContextKeywordFilter(40, false),
-		obscura.NewChecksumFilter(),
-	}
+	return []obscura.Filter{obscura.NewContextKeywordFilter(40, false)}
 }
 
 var _ obscura.Detector = GovID{}

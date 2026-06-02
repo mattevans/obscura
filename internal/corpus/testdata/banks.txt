@@ -10,6 +10,11 @@ For US ACH the routing number is <<ROUTING>>021000021<<>> and the account follow
 Payroll runs through routing <<ROUTING>>121000248<<>> at the West-coast branch.
 The Midwest branch uses ABA <<ROUTING>>011401533<<>> for incoming wires.
 Reconcile against routing <<ROUTING>>026009593<<>> for the East-coast accounts.
+Pay the UK supplier via sort code <<ROUTING>>09-01-28<<>> to their current account.
+The Australian branch BSB <<ROUTING>>062-000<<>> routes the domestic transfer.
+Deposit into the NZ bank account <<ROUTING>>01-0902-0068389-00<<>> for the contractor.
 A mistyped IBAN GB00WEST12345698765432 must be rejected by the mod-97 check, not redacted.
 The internal ledger code 123456789 is not a routing number and fails the ABA checksum.
 Our purchase-order sequence reached 999999999 this year but it is not a bank identifier.
+The cup final ended 09-01-28 on aggregate over the two legs last weekend.
+Part number 062-000 sits on the shelf in the spare-parts bin downstairs.

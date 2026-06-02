@@ -5,6 +5,10 @@ The UK contractor's National Insurance number is <<GOV_ID>>AB123456C<<>> per HMR
 Another UK staff member listed NINO <<GOV_ID>>JG 12 34 56 D<<>> on the starter checklist.
 The Australian employee provided tax file number <<GOV_ID>>123 456 782<<>> at onboarding.
 A second Australian hire gave TFN <<GOV_ID>>876 543 210<<>> on the declaration form.
+The New Zealand contractor's IRD number is <<GOV_ID>>49091850<<>> on the tax declaration.
+A second NZ worker listed IRD number <<GOV_ID>>136-410-132<<>> on the IR330 form.
 The HR badge number 7782 and the desk code 4456 are internal references only.
 Employee record E-4456-K tracks the onboarding paperwork, not a government identifier.
 The case file numbered 12-3456 is an internal ticket, not a social security number.
+The warehouse lot 49091850 was counted twice during the annual stocktake.
+A mistyped IRD 49091851 fails the mod-11 check and must be left alone, not redacted.

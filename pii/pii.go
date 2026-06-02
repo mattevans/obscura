@@ -14,15 +14,18 @@ import (
 )
 
 // All returns one instance of every built-in PII detector, ready to register with a Scrubber.
-func All() []obscura.Detector {
+// Options (e.g. WithLocales) are forwarded to the locale-aware detectors — phone, bank, gov-ID,
+// and business-ID — and ignored by the rest. With no options every supported jurisdiction is
+// recognised.
+func All(opts ...Option) []obscura.Detector {
 	return []obscura.Detector{
 		NewEmail(),
-		NewPhone(),
+		NewPhone(opts...),
 		NewCreditCard(),
-		NewBank(),
+		NewBank(opts...),
 		NewNetwork(),
-		NewGovID(),
-		NewBusinessID(),
+		NewGovID(opts...),
+		NewBusinessID(opts...),
 		NewCrypto(),
 	}
 }

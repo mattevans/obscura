@@ -127,7 +127,7 @@ func byteToUnicode() [256]rune {
 	}
 	// Remaining bytes map to code points starting at 256, in byte order.
 	n := 0
-	for b := 0; b < 256; b++ {
+	for b := range 256 {
 		if assigned[b] {
 			continue
 		}

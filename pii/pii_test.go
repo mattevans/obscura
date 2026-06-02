@@ -35,12 +35,13 @@ func TestEmailDetect(t *testing.T) {
 
 func TestCreditCardDetectAndLuhn(t *testing.T) {
 	d := pii.NewCreditCard()
-	// Detection is liberal; the Luhn filter validates separately.
+	// The Luhn check runs during detection: a valid card surfaces, a Luhn-invalid run does not.
 	got := detect(d, "pay 4111 1111 1111 1111 now")
 	require.Len(t, got, 1)
 	assert.Equal(t, obscura.KindCreditCard, got[0].Kind)
+	assert.Empty(t, detect(d, "ref 1234 5678 9012 3456 only"), "Luhn-invalid run is not a card")
 
-	// The detector declares Luhn as a default filter.
+	// The detector still declares a cue-word filter to lift confidence.
 	fp, ok := d.(interface{ DefaultFilters() []obscura.Filter })
 	require.True(t, ok)
 	require.NotEmpty(t, fp.DefaultFilters())
@@ -88,15 +89,12 @@ func TestPhoneInternationalSingleDigitArea(t *testing.T) {
 
 func TestBusinessIDDetect(t *testing.T) {
 	d := pii.NewBusinessID()
-	// Detection is liberal; the checksum filter validates separately, so both a real ABN and a
-	// random 11-digit run are surfaced as candidates here.
+	// Checksums run during detection, so a valid ABN and NZBN surface while a checksum-failing
+	// 11-digit run does not.
 	got := valuesOf(detect(d, "abn 30 164 696 039 and nzbn 9429048825658"))
 	assert.Contains(t, got, "30 164 696 039")
 	assert.Contains(t, got, "9429048825658")
-
-	fp, ok := d.(interface{ DefaultFilters() []obscura.Filter })
-	require.True(t, ok)
-	require.NotEmpty(t, fp.DefaultFilters(), "business-id declares the checksum filter")
+	assert.Empty(t, detect(d, "ref 12345678901 is a SKU"), "checksum-failing run is not a business ID")
 }
 
 func TestGovIDSSN(t *testing.T) {
