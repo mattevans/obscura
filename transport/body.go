@@ -30,6 +30,7 @@ func parseFieldPaths(paths []string) []fieldPath {
 	for _, p := range paths {
 		out = append(out, strings.Split(p, "."))
 	}
+
 	return out
 }
 
@@ -41,9 +42,11 @@ func redactJSONBody(body []byte, paths []fieldPath, sess *obscura.Session) ([]by
 	if err := json.Unmarshal(body, &root); err != nil {
 		return nil, err
 	}
+
 	for _, p := range paths {
 		root = redactPath(root, p, sess)
 	}
+
 	return json.Marshal(root)
 }
 
@@ -55,21 +58,26 @@ func redactPath(node any, path fieldPath, sess *obscura.Session) any {
 		if str, ok := node.(string); ok {
 			return sess.Redact(str)
 		}
+
 		return node
 	}
 
 	seg, rest := path[0], path[1:]
+
 	switch n := node.(type) {
 	case map[string]any:
 		if seg == "*" {
 			for k, v := range n {
 				n[k] = redactPath(v, rest, sess)
 			}
+
 			return n
 		}
+
 		if v, ok := n[seg]; ok {
 			n[seg] = redactPath(v, rest, sess)
 		}
+
 		return n
 	case []any:
 		if seg == "*" {
@@ -77,6 +85,7 @@ func redactPath(node any, path fieldPath, sess *obscura.Session) any {
 				n[i] = redactPath(v, rest, sess)
 			}
 		}
+
 		return n
 	default:
 		return node
@@ -92,10 +101,12 @@ func newRestoreReader(src io.ReadCloser, v *obscura.Vault) *restoreReader {
 func (r *restoreReader) Read(p []byte) (int, error) {
 	for r.buf.Len() == 0 && !r.eof {
 		chunk := make([]byte, 4096)
+
 		n, err := r.src.Read(chunk)
 		if n > 0 {
 			r.buf.WriteString(r.st.Push(string(chunk[:n])))
 		}
+
 		switch {
 		case err == io.EOF:
 			r.buf.WriteString(r.st.Flush())
@@ -104,9 +115,11 @@ func (r *restoreReader) Read(p []byte) (int, error) {
 			return 0, err
 		}
 	}
+
 	if r.buf.Len() == 0 && r.eof {
 		return 0, io.EOF
 	}
+
 	return r.buf.Read(p)
 }
 

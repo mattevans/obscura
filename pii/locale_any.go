@@ -28,7 +28,7 @@ func localeAnyRules() []localeRule {
 
 	return []localeRule{
 		{locale: localeAny, kind: obscura.KindIBAN, rule: "pii:iban", re: ibanRegex, score: 0.8, validate: validIBAN},
-		{locale: localeAny, kind: obscura.KindPhone, rule: "pii:phone", re: e164Regex, score: phoneScore},
-		{locale: localeAny, kind: obscura.KindPhone, rule: "pii:phone", re: intlGroupedRegex, score: phoneScore},
+		{locale: localeAny, kind: obscura.KindPhone, rule: rulePhone, re: e164Regex, score: phoneScore},
+		{locale: localeAny, kind: obscura.KindPhone, rule: rulePhone, re: intlGroupedRegex, score: phoneScore},
 	}
 }

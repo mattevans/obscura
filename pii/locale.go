@@ -68,9 +68,11 @@ func WithLocales(locales ...Locale) Option {
 		if len(locales) == 0 {
 			return
 		}
+
 		if c.locales == nil {
 			c.locales = make(map[Locale]bool, len(locales))
 		}
+
 		for _, l := range locales {
 			c.locales[l] = true
 		}
@@ -83,6 +85,7 @@ func newLocaleConfig(opts []Option) localeConfig {
 	for _, o := range opts {
 		o(&c)
 	}
+
 	return c
 }
 
@@ -95,6 +98,7 @@ func selectRules(all []localeRule, cfg localeConfig) []localeRule {
 			out = append(out, r)
 		}
 	}
+
 	return out
 }
 
@@ -108,9 +112,11 @@ func detectRules(rules []localeRule, text string) []obscura.Match {
 			if r.validate != nil && !r.validate(value) {
 				continue
 			}
+
 			if r.requireCue && !hasCueNearby(text, loc[0], loc[1], r.cues) {
 				continue
 			}
+
 			matches = append(matches, obscura.Match{
 				Kind:  r.kind,
 				Start: loc[0],
@@ -121,6 +127,7 @@ func detectRules(rules []localeRule, text string) []obscura.Match {
 			})
 		}
 	}
+
 	return matches
 }
 
@@ -131,6 +138,7 @@ func allLocaleRules() []localeRule {
 	for _, src := range localeRuleSources {
 		out = append(out, src()...)
 	}
+
 	return out
 }
 
@@ -142,13 +150,16 @@ func rulesForKinds(kinds ...obscura.Kind) []localeRule {
 	for _, k := range kinds {
 		want[k] = true
 	}
+
 	all := allLocaleRules()
+
 	out := make([]localeRule, 0, len(all))
 	for _, r := range all {
 		if want[r.kind] {
 			out = append(out, r)
 		}
 	}
+
 	return out
 }
 
@@ -157,11 +168,13 @@ func rulesForKinds(kinds ...obscura.Kind) []localeRule {
 func hasCueNearby(text string, start, end int, cues []string) bool {
 	lo := max(start-cueWindow, 0)
 	hi := min(end+cueWindow, len(text))
+
 	window := strings.ToLower(text[lo:hi])
 	for _, cue := range cues {
 		if strings.Contains(window, cue) {
 			return true
 		}
 	}
+
 	return false
 }

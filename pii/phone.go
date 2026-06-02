@@ -6,6 +6,10 @@ import (
 	"github.com/mattevans/obscura"
 )
 
+// rulePhone is the shared rule id stamped on every phone match, regardless of the locale pattern
+// that produced it — the detector reports a single phone kind, not one rule per jurisdiction.
+const rulePhone = "pii:phone"
+
 // phoneRunTrailing matches a separator-led continuation of further digit groups, used to
 // recognise that a phone candidate is really a fragment clipped from a longer numeric run
 // (e.g. a card or account number) on its trailing side. The group is two-to-four digits so a
@@ -30,7 +34,7 @@ func NewPhone(opts ...Option) obscura.Detector {
 }
 
 // Name identifies the detector.
-func (Phone) Name() string { return "pii:phone" }
+func (Phone) Name() string { return rulePhone }
 
 // Detect returns every phone number found in text. Overlapping hits from the + forms and the
 // national patterns are reconciled later by overlap resolution.
@@ -60,9 +64,11 @@ func (phoneRunFilter) Apply(m obscura.Match, fc obscura.FilterContext) (float64,
 	if m.Kind != obscura.KindPhone {
 		return m.Score, true
 	}
+
 	if phoneRunTrailing.MatchString(fc.Text[m.End:]) || phoneRunLeading.MatchString(fc.Text[:m.Start]) {
 		return 0, false
 	}
+
 	return m.Score, true
 }
 

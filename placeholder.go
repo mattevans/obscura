@@ -36,12 +36,13 @@ func StyleASCII() PlaceholderStyle { return newDelimStyle("[[", "]]") }
 
 // StyleCustom builds a style from arbitrary delimiters (e.g. "<<" and ">>"). The delimiters
 // must not be empty and should be improbable in normal text.
-func StyleCustom(open, close string) PlaceholderStyle { return newDelimStyle(open, close) }
+func StyleCustom(open, closing string) PlaceholderStyle { return newDelimStyle(open, closing) }
 
-func newDelimStyle(open, close string) PlaceholderStyle {
+func newDelimStyle(open, closing string) PlaceholderStyle {
 	// Match <open>KIND_n<close> where KIND is upper-case letters/underscores and n is digits.
-	re := regexp.MustCompile("^" + regexp.QuoteMeta(open) + `([A-Z_]+)_(\d+)` + regexp.QuoteMeta(close) + "$")
-	return &delimStyle{open: open, close: close, re: re}
+	re := regexp.MustCompile("^" + regexp.QuoteMeta(open) + `([A-Z_]+)_(\d+)` + regexp.QuoteMeta(closing) + "$")
+
+	return &delimStyle{open: open, close: closing, re: re}
 }
 
 // Format renders the placeholder for the n-th value of a kind.
@@ -55,10 +56,12 @@ func (d *delimStyle) Parse(s string) (Kind, int, bool) {
 	if m == nil {
 		return "", 0, false
 	}
+
 	n, err := strconv.Atoi(m[2])
 	if err != nil {
 		return "", 0, false
 	}
+
 	return Kind(m[1]), n, true
 }
 

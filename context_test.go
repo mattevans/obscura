@@ -25,6 +25,7 @@ func (f fakeNER) DetectContext(ctx context.Context, _ string) ([]obscura.Match, 
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+
 	return f.matches, f.err
 }
 

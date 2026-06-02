@@ -24,12 +24,14 @@ func (CreditCard) Name() string { return "pii:credit-card" }
 // checksum so non-cards never reach the resolver.
 func (CreditCard) Detect(text string) []obscura.Match {
 	all := findMatches(creditCardRegex, text, obscura.KindCreditCard, 0.7, "pii:credit-card")
+
 	kept := all[:0]
 	for _, m := range all {
 		if validLuhn(m.Value) {
 			kept = append(kept, m)
 		}
 	}
+
 	return kept
 }
 

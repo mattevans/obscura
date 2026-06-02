@@ -49,19 +49,23 @@ func NewRule(id, pattern string, keywords []string, entropy float64) (Rule, erro
 	if err != nil {
 		return Rule{}, fmt.Errorf("secret: rule %q: %w", id, err)
 	}
+
 	return Rule{id: id, re: re, keywords: keywords, entropy: entropy}, nil
 }
 
 // NewRuleSet compiles a set of rules into a ready-to-run RuleSet with its keyword automaton.
 func NewRuleSet(rules ...Rule) RuleSet {
 	keywords := make([][]string, len(rules))
+
 	var always []int
+
 	for i, r := range rules {
 		keywords[i] = r.keywords
 		if len(r.keywords) == 0 {
 			always = append(always, i)
 		}
 	}
+
 	return RuleSet{
 		rules:   rules,
 		matcher: newAhoCorasick(keywords),
@@ -86,14 +90,17 @@ func (d *Detector) Detect(text string) []obscura.Match {
 	}
 
 	var matches []obscura.Match
+
 	for idx := range candidates {
 		r := d.rs.rules[idx]
 		for _, loc := range r.re.FindAllStringSubmatchIndex(text, -1) {
 			start, end := secretSpan(loc)
+
 			value := text[start:end]
 			if r.entropy > 0 && shannonBits(value) < r.entropy {
 				continue
 			}
+
 			matches = append(matches, obscura.Match{
 				Kind:  obscura.KindSecret,
 				Start: start,
@@ -104,6 +111,7 @@ func (d *Detector) Detect(text string) []obscura.Match {
 			})
 		}
 	}
+
 	return matches
 }
 
@@ -114,6 +122,7 @@ func (d *Detector) candidateRules(text string) map[int]struct{} {
 	for _, idx := range d.rs.always {
 		hits[idx] = struct{}{}
 	}
+
 	return hits
 }
 
@@ -123,6 +132,7 @@ func secretSpan(loc []int) (int, int) {
 	if len(loc) >= 4 && loc[2] >= 0 {
 		return loc[2], loc[3]
 	}
+
 	return loc[0], loc[1]
 }
 
@@ -130,14 +140,17 @@ func secretSpan(loc []int) (int, int) {
 // higher-entropy hits (more key-like) score higher.
 func scoreFor(value string, floor float64) float64 {
 	score := baseScore
+
 	if floor > 0 {
 		if margin := shannonBits(value) - floor; margin > 0 {
 			score += margin / 16
 		}
 	}
+
 	if score > 0.98 {
 		return 0.98
 	}
+
 	return score
 }
 

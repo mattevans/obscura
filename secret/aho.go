@@ -21,12 +21,15 @@ func newAhoCorasick(keywords [][]string) *ahoCorasick {
 		fail:   []int{0},
 		output: [][]int{nil},
 	}
+
 	for ruleIdx, kws := range keywords {
 		for _, kw := range kws {
 			ac.insert(lower(kw), ruleIdx)
 		}
 	}
+
 	ac.build()
+
 	return ac
 }
 
@@ -34,30 +37,38 @@ func newAhoCorasick(keywords [][]string) *ahoCorasick {
 func (ac *ahoCorasick) match(text string) map[int]struct{} {
 	hits := make(map[int]struct{})
 	state := 0
+
 	for i := 0; i < len(text); i++ {
 		c := lowerByte(text[i])
 		for {
 			if nxt, ok := ac.next[state][c]; ok {
 				state = nxt
+
 				break
 			}
+
 			if state == 0 {
 				break
 			}
+
 			state = ac.fail[state]
 		}
+
 		for _, ruleIdx := range ac.output[state] {
 			hits[ruleIdx] = struct{}{}
 		}
 	}
+
 	return hits
 }
 
 // insert adds a keyword to the trie, recording ruleIdx at its terminal node.
 func (ac *ahoCorasick) insert(kw string, ruleIdx int) {
 	state := 0
+
 	for i := 0; i < len(kw); i++ {
 		c := kw[i]
+
 		nxt, ok := ac.next[state][c]
 		if !ok {
 			nxt = len(ac.next)
@@ -66,8 +77,10 @@ func (ac *ahoCorasick) insert(kw string, ruleIdx int) {
 			ac.output = append(ac.output, nil)
 			ac.next[state][c] = nxt
 		}
+
 		state = nxt
 	}
+
 	ac.output[state] = append(ac.output[state], ruleIdx)
 }
 
@@ -78,23 +91,31 @@ func (ac *ahoCorasick) build() {
 		ac.fail[nxt] = 0
 		queue = append(queue, nxt)
 	}
+
 	for len(queue) > 0 {
 		state := queue[0]
+
 		queue = queue[1:]
 		for c, nxt := range ac.next[state] {
 			queue = append(queue, nxt)
+
 			f := ac.fail[state]
 			for {
 				if t, ok := ac.next[f][c]; ok {
 					ac.fail[nxt] = t
+
 					break
 				}
+
 				if f == 0 {
 					ac.fail[nxt] = 0
+
 					break
 				}
+
 				f = ac.fail[f]
 			}
+
 			ac.output[nxt] = append(ac.output[nxt], ac.output[ac.fail[nxt]]...)
 		}
 	}
@@ -106,6 +127,7 @@ func lower(s string) string {
 	for i := range b {
 		b[i] = lowerByte(b[i])
 	}
+
 	return string(b)
 }
 
@@ -114,5 +136,6 @@ func lowerByte(c byte) byte {
 	if c >= 'A' && c <= 'Z' {
 		return c + ('a' - 'A')
 	}
+
 	return c
 }

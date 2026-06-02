@@ -50,6 +50,7 @@ func New(opts ...Option) *Filter {
 	for _, opt := range opts {
 		opt(f)
 	}
+
 	return f
 }
 
@@ -81,16 +82,19 @@ func (f *Filter) Apply(m obscura.Match, _ obscura.FilterContext) (float64, bool)
 	if strings.ContainsAny(m.Value, " \t\r\n") {
 		return m.Score, true
 	}
+
 	n := f.enc.CountTokens(m.Value)
 	if n == 0 {
 		return m.Score, true
 	}
+
 	cpt := float64(utf8.RuneCountInString(m.Value)) / float64(n)
 	if cpt > f.maxCPT {
 		return 0, false // tokenizes like natural language -> drop as a false positive
 	}
 	// Lower chars-per-token means more fragmented, hence more secret-like: lift the score.
 	bumped := m.Score + (f.maxCPT-cpt)/f.maxCPT*confidenceBump
+
 	return clamp01(bumped), true
 }
 
@@ -99,9 +103,11 @@ func clamp01(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
+
 	if x > 1 {
 		return 1
 	}
+
 	return x
 }
 

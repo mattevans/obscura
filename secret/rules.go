@@ -118,8 +118,10 @@ func DefaultRules() RuleSet {
 		for _, spec := range defaultRuleSpecs {
 			rules = append(rules, mustRule(spec.id, spec.pattern, spec.keywords, spec.entropy))
 		}
+
 		defaultRules = NewRuleSet(rules...)
 	})
+
 	return defaultRules
 }
 
@@ -130,5 +132,6 @@ func mustRule(id, pattern string, keywords []string, entropy float64) Rule {
 	if err != nil {
 		panic(err)
 	}
+
 	return r
 }

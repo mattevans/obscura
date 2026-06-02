@@ -12,13 +12,16 @@ import (
 
 func detectValues(t *testing.T, text string) []string {
 	t.Helper()
+
 	d := secret.NewDetector(secret.DefaultRules())
 	matches := d.Detect(text)
+
 	out := make([]string, 0, len(matches))
 	for _, m := range matches {
 		assert.Equal(t, obscura.KindSecret, m.Kind)
 		out = append(out, m.Value)
 	}
+
 	return out
 }
 
@@ -81,6 +84,7 @@ func TestEndToEndRedactWithSecrets(t *testing.T) {
 func TestCustomRule(t *testing.T) {
 	r, err := secret.NewRule("acme-token", `\bACME-[0-9A-F]{12}\b`, []string{"ACME-"}, 0)
 	require.NoError(t, err)
+
 	d := secret.NewDetector(secret.NewRuleSet(r))
 	matches := d.Detect("use ACME-0123456789AB please")
 	require.Len(t, matches, 1)

@@ -61,19 +61,24 @@ func Load() ([]Doc, error) {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".txt") {
 			continue
 		}
+
 		raw, err := fs.ReadFile(files, path.Join("testdata", e.Name()))
 		if err != nil {
 			return nil, fmt.Errorf("corpus: read %s: %w", e.Name(), err)
 		}
+
 		name := strings.TrimSuffix(e.Name(), ".txt")
+
 		doc, err := Parse(name, string(raw))
 		if err != nil {
 			return nil, fmt.Errorf("corpus: parse %s: %w", e.Name(), err)
 		}
+
 		docs = append(docs, doc)
 	}
 
 	sort.Slice(docs, func(i, j int) bool { return docs[i].Name < docs[j].Name })
+
 	return docs, nil
 }
 
@@ -88,6 +93,7 @@ func Parse(name, marked string) (Doc, error) {
 		kind  obscura.Kind
 		start int
 	}
+
 	stack := make([]open, 0, 4)
 	spans := make([]Span, 0, 8)
 
@@ -98,6 +104,7 @@ func Parse(name, marked string) (Doc, error) {
 			if rel < 0 {
 				return Doc{}, fmt.Errorf("corpus: %s: unterminated marker at byte %d", name, i)
 			}
+
 			token := marked[i+len(markerOpen) : i+len(markerOpen)+rel]
 			i += len(markerOpen) + rel + len(markerClose)
 
@@ -105,14 +112,20 @@ func Parse(name, marked string) (Doc, error) {
 				if len(stack) == 0 {
 					return Doc{}, fmt.Errorf("corpus: %s: close marker with no open at byte %d", name, i)
 				}
+
 				o := stack[len(stack)-1]
 				stack = stack[:len(stack)-1]
+
 				spans = append(spans, Span{Kind: o.kind, Start: o.start, End: b.Len()})
+
 				continue
 			}
+
 			stack = append(stack, open{kind: obscura.Kind(token), start: b.Len()})
+
 			continue
 		}
+
 		b.WriteByte(marked[i])
 		i++
 	}
@@ -125,6 +138,7 @@ func Parse(name, marked string) (Doc, error) {
 	for j := range spans {
 		spans[j].Value = text[spans[j].Start:spans[j].End]
 	}
+
 	sort.Slice(spans, func(a, c int) bool { return spans[a].Start < spans[c].Start })
 
 	return Doc{Name: name, Text: text, Spans: spans}, nil

@@ -33,9 +33,11 @@ func (c *chunkReader) Read(p []byte) (int, error) {
 	if c.pos >= len(c.data) {
 		return 0, io.EOF
 	}
+
 	end := min(c.pos+c.size, len(c.data))
 	n := copy(p, c.data[c.pos:end])
 	c.pos += n
+
 	return n, nil
 }
 
@@ -47,25 +49,31 @@ func newScrubber() *obscura.Scrubber {
 
 func jsonRequest(t *testing.T, body string) *http.Request {
 	t.Helper()
+
 	req, err := http.NewRequest(http.MethodPost, "https://api.example.com/v1/chat", strings.NewReader(body))
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
+
 	return req
 }
 
 func TestRedactsRequestBody(t *testing.T) {
 	var outbound string
+
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		b, _ := io.ReadAll(r.Body)
 		outbound = string(b)
+
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader("{}")), Header: http.Header{}}, nil
 	})
 
 	rt := transport.New(newScrubber(), base, transport.JSONBodyFields("messages.*.content"))
 	client := &http.Client{Transport: rt}
 
-	_, err := client.Do(jsonRequest(t, `{"messages":[{"role":"user","content":"email me at a@b.com"}]}`))
+	resp, err := client.Do(jsonRequest(t, `{"messages":[{"role":"user","content":"email me at a@b.com"}]}`))
 	require.NoError(t, err)
+
+	defer resp.Body.Close()
 
 	assert.NotContains(t, outbound, "a@b.com", "PII must not leave in the request body")
 	assert.Contains(t, outbound, "EMAIL_1", "redacted body should carry a placeholder")
@@ -75,6 +83,7 @@ func TestRestoresResponseBody(t *testing.T) {
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		// The model echoes the placeholder back in its reply.
 		body := `{"reply":"Noted, I will email ⟦EMAIL_1⟧ shortly."}`
+
 		return &http.Response{
 			StatusCode: 200,
 			Body:       io.NopCloser(strings.NewReader(body)),
@@ -89,6 +98,7 @@ func TestRestoresResponseBody(t *testing.T) {
 
 	resp, err := client.Do(jsonRequest(t, `{"messages":[{"role":"user","content":"reach a@b.com"}]}`))
 	require.NoError(t, err)
+
 	defer resp.Body.Close()
 
 	out, err := io.ReadAll(resp.Body)
@@ -101,6 +111,7 @@ func TestRestoresStreamedResponseAcrossChunks(t *testing.T) {
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		// SSE-style stream; the placeholder ⟦EMAIL_1⟧ will be split across 4-byte reads.
 		body := "data: Noted ⟦EMAIL_1⟧\n\ndata: [DONE]\n\n"
+
 		return &http.Response{
 			StatusCode: 200,
 			Body:       &chunkReader{data: []byte(body), size: 4},
@@ -115,6 +126,7 @@ func TestRestoresStreamedResponseAcrossChunks(t *testing.T) {
 
 	resp, err := client.Do(jsonRequest(t, `{"messages":[{"role":"user","content":"reach a@b.com"}]}`))
 	require.NoError(t, err)
+
 	defer resp.Body.Close()
 
 	out, err := io.ReadAll(resp.Body)
@@ -127,23 +139,30 @@ func TestFailsClosedOnInvalidJSON(t *testing.T) {
 	called := false
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		called = true
+
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader("{}")), Header: http.Header{}}, nil
 	})
 
 	rt := transport.New(newScrubber(), base, transport.JSONBodyFields("content"))
 	client := &http.Client{Transport: rt}
 
-	_, err := client.Do(jsonRequest(t, `not valid json at all`))
+	resp, err := client.Do(jsonRequest(t, `not valid json at all`))
 	require.Error(t, err)
 	assert.ErrorIs(t, err, transport.ErrRedactionFailed)
 	assert.False(t, called, "must not forward when redaction fails closed")
+
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
 }
 
 func TestFailOpenForwardsOriginal(t *testing.T) {
 	var outbound string
+
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		b, _ := io.ReadAll(r.Body)
 		outbound = string(b)
+
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader("{}")), Header: http.Header{}}, nil
 	})
 
@@ -152,8 +171,11 @@ func TestFailOpenForwardsOriginal(t *testing.T) {
 		transport.FailOpen())
 	client := &http.Client{Transport: rt}
 
-	_, err := client.Do(jsonRequest(t, `plain text body`))
+	resp, err := client.Do(jsonRequest(t, `plain text body`))
 	require.NoError(t, err)
+
+	defer resp.Body.Close()
+
 	assert.Equal(t, "plain text body", outbound, "fail-open forwards the original body")
 }
 
@@ -162,16 +184,20 @@ func TestDoesNotMutateCallerRequestMetadata(t *testing.T) {
 	// caller's request keeps its original headers and URL. (Consuming Body is permitted by the
 	// RoundTripper contract.)
 	var forwarded *http.Request
+
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		forwarded = r
+
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader("{}")), Header: http.Header{}}, nil
 	})
 	rt := transport.New(newScrubber(), base, transport.JSONBodyFields("messages.*.content"))
 
 	req := jsonRequest(t, `{"messages":[{"role":"user","content":"a@b.com"}]}`)
 	req.Header.Set("X-Caller", "keep-me")
-	_, err := rt.RoundTrip(req)
+	resp, err := rt.RoundTrip(req)
 	require.NoError(t, err)
+
+	defer resp.Body.Close()
 
 	require.NotNil(t, forwarded)
 	assert.NotSame(t, req, forwarded, "must forward a clone, not the caller's request")
@@ -189,22 +215,30 @@ func TestNoBodyPassesThrough(t *testing.T) {
 	require.NoError(t, err)
 	resp, err := rt.RoundTrip(req)
 	require.NoError(t, err)
+
+	defer resp.Body.Close()
+
 	assert.Equal(t, 200, resp.StatusCode)
 }
 
 func TestRedactedBodyIsValidJSON(t *testing.T) {
 	var outbound []byte
+
 	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
 		outbound, _ = io.ReadAll(r.Body)
+
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader("{}")), Header: http.Header{}}, nil
 	})
 	rt := transport.New(newScrubber(), base, transport.JSONBodyFields("messages.*.content"))
 
-	_, err := rt.RoundTrip(jsonRequest(t, `{"messages":[{"role":"user","content":"a@b.com and 4111 1111 1111 1111"}],"model":"x"}`))
+	resp, err := rt.RoundTrip(jsonRequest(t, `{"messages":[{"role":"user","content":"a@b.com and 4111 1111 1111 1111"}],"model":"x"}`))
 	require.NoError(t, err)
+
+	defer resp.Body.Close()
 
 	var parsed map[string]any
 	require.NoError(t, json.Unmarshal(outbound, &parsed), "redacted body must remain valid JSON")
 	assert.Equal(t, "x", parsed["model"], "non-targeted fields must be preserved")
+
 	_ = bytes.TrimSpace(outbound)
 }

@@ -27,6 +27,6 @@ func gbRules() []localeRule {
 			locale: LocaleGB, kind: obscura.KindRouting, rule: "pii:sort-code", re: sortCodeRegex, score: 0.6,
 			requireCue: true, cues: []string{"sort code", "sort-code", "sortcode"},
 		},
-		{locale: LocaleGB, kind: obscura.KindPhone, rule: "pii:phone", re: gbPhoneRegex, score: 0.6},
+		{locale: LocaleGB, kind: obscura.KindPhone, rule: rulePhone, re: gbPhoneRegex, score: 0.6},
 	}
 }

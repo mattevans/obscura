@@ -39,7 +39,7 @@ func nzRules() []localeRule {
 			locale: LocaleNZ, kind: obscura.KindRouting, rule: "pii:nz-bank-account", re: nzAccountRegex, score: 0.6,
 			requireCue: true, cues: []string{"bank", "account", "a/c"},
 		},
-		{locale: LocaleNZ, kind: obscura.KindPhone, rule: "pii:phone", re: nzPhoneRegex, score: phoneScore},
-		{locale: LocaleNZ, kind: obscura.KindPhone, rule: "pii:phone", re: nzMobileRegex, score: phoneScore},
+		{locale: LocaleNZ, kind: obscura.KindPhone, rule: rulePhone, re: nzPhoneRegex, score: phoneScore},
+		{locale: LocaleNZ, kind: obscura.KindPhone, rule: rulePhone, re: nzMobileRegex, score: phoneScore},
 	}
 }

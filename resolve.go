@@ -25,12 +25,14 @@ func resolveOverlaps(matches []Match, priority map[Kind]int) []Match {
 		if overlapsAny(m, accepted) {
 			continue
 		}
+
 		accepted = append(accepted, m)
 	}
 
 	sort.SliceStable(accepted, func(i, j int) bool {
 		return accepted[i].Start < accepted[j].Start
 	})
+
 	return accepted
 }
 
@@ -39,12 +41,15 @@ func less(a, b Match, priority map[Kind]int) bool {
 	if pa, pb := priority[a.Kind], priority[b.Kind]; pa != pb {
 		return pa > pb
 	}
+
 	if a.Score != b.Score {
 		return a.Score > b.Score
 	}
+
 	if la, lb := a.End-a.Start, b.End-b.Start; la != lb {
 		return la > lb
 	}
+
 	return a.Start < b.Start
 }
 
@@ -55,5 +60,6 @@ func overlapsAny(m Match, accepted []Match) bool {
 			return true
 		}
 	}
+
 	return false
 }

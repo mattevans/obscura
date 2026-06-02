@@ -50,10 +50,12 @@ func (v *Vault) Restore(llmOutput string) string {
 	if len(v.byPlace) == 0 {
 		return llmOutput
 	}
+
 	pairs := make([]string, 0, len(v.byPlace)*2)
 	for ph, e := range v.byPlace {
 		pairs = append(pairs, ph, e.original)
 	}
+
 	return strings.NewReplacer(pairs...).Replace(llmOutput)
 }
 
@@ -76,12 +78,15 @@ func (v *Vault) LogValue() slog.Value {
 // buffered until a later Push or Flush completes it.
 func (s *RestoreStreamer) Push(delta string) string {
 	s.carry = append(s.carry, delta...)
+
 	cut := s.safeEmitBoundary()
 	if cut == 0 {
 		return ""
 	}
+
 	out := s.v.Restore(string(s.carry[:cut]))
 	s.carry = append(s.carry[:0], s.carry[cut:]...)
+
 	return out
 }
 
@@ -91,8 +96,10 @@ func (s *RestoreStreamer) Flush() string {
 	if len(s.carry) == 0 {
 		return ""
 	}
+
 	out := s.v.Restore(string(s.carry))
 	s.carry = s.carry[:0]
+
 	return out
 }
 
@@ -104,6 +111,7 @@ func (v *Vault) placeholderFor(kind Kind, value string) string {
 			return ph
 		}
 	}
+
 	v.counters[kind]++
 	ph := v.style.Format(kind, v.counters[kind])
 
@@ -112,8 +120,10 @@ func (v *Vault) placeholderFor(kind Kind, value string) string {
 		byVal = make(map[string]string, 4)
 		v.byValue[kind] = byVal
 	}
+
 	byVal[value] = ph
 	v.byPlace[ph] = entry{original: value, kind: kind}
+
 	return ph
 }
 
@@ -136,6 +146,7 @@ func (s *RestoreStreamer) safeEmitBoundary() int {
 func (s *RestoreStreamer) lastUnclosedOpen() int {
 	carry := string(s.carry)
 	closeDelim := s.v.style.Close()
+
 	search := carry
 	for {
 		idx := strings.LastIndex(search, s.open)
@@ -153,6 +164,7 @@ func (s *RestoreStreamer) lastUnclosedOpen() int {
 	if p := partialOpenSuffix(carry, s.open); p >= 0 {
 		return p
 	}
+
 	return len(s.carry)
 }
 
@@ -167,13 +179,16 @@ func trimPartialRune(b []byte) int {
 		if b[i]&0xC0 == 0x80 {
 			continue // continuation byte
 		}
+
 		if utf8.RuneStart(b[i]) {
 			if r, size := utf8.DecodeRune(b[i:]); r != utf8.RuneError || size > 1 {
 				return len(b) // last rune is complete
 			}
+
 			return i // incomplete rune begins at i
 		}
 	}
+
 	return len(b)
 }
 
@@ -186,5 +201,6 @@ func partialOpenSuffix(s, open string) int {
 			return len(s) - n
 		}
 	}
+
 	return -1
 }

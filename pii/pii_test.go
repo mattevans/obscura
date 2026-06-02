@@ -26,6 +26,7 @@ func TestEmailDetect(t *testing.T) {
 		{"no email here", nil},
 		{"not@an", nil},
 	}
+
 	d := pii.NewEmail()
 	for _, tt := range tests {
 		got := valuesOf(detect(d, tt.in))
@@ -51,12 +52,15 @@ func TestBankIBAN(t *testing.T) {
 	d := pii.NewBank()
 	// A structurally valid IBAN (GB checksum correct).
 	got := detect(d, "send to GB82WEST12345698765432 please")
+
 	var found bool
+
 	for _, m := range got {
 		if m.Kind == obscura.KindIBAN {
 			found = true
 		}
 	}
+
 	assert.True(t, found, "expected an IBAN candidate")
 }
 
@@ -113,10 +117,12 @@ func TestCryptoETH(t *testing.T) {
 func TestAllReturnsEveryDetector(t *testing.T) {
 	got := pii.All()
 	assert.Len(t, got, 8)
+
 	names := make(map[string]bool, len(got))
 	for _, d := range got {
 		names[d.Name()] = true
 	}
+
 	for _, want := range []string{"pii:email", "pii:phone", "pii:credit-card", "pii:bank", "pii:network", "pii:gov-id", "pii:business-id", "pii:crypto"} {
 		assert.True(t, names[want], "missing detector %s", want)
 	}
@@ -126,9 +132,11 @@ func valuesOf(matches []obscura.Match) []string {
 	if len(matches) == 0 {
 		return nil
 	}
+
 	out := make([]string, 0, len(matches))
 	for _, m := range matches {
 		out = append(out, m.Value)
 	}
+
 	return out
 }

@@ -33,6 +33,7 @@ func (Network) Detect(text string) []obscura.Match {
 	matches := findMatches(macRegex, text, obscura.KindMAC, 0.85, "pii:mac")
 	matches = append(matches, findMatches(ipv4Regex, text, obscura.KindIPAddress, 0.7, "pii:ipv4")...)
 	matches = append(matches, findMatches(ipv6Regex, text, obscura.KindIPAddress, 0.7, "pii:ipv6")...)
+
 	return matches
 }
 

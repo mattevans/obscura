@@ -46,10 +46,12 @@ func New(scrubber *obscura.Scrubber, base http.RoundTripper, opts ...Option) *Tr
 	if base == nil {
 		base = http.DefaultTransport
 	}
+
 	t := &Transport{scrubber: scrubber, base: base}
 	for _, opt := range opts {
 		opt(t)
 	}
+
 	return t
 }
 
@@ -89,6 +91,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		resp.ContentLength = -1 // length changes after restoration; force chunked/unknown
 		resp.Header.Del("Content-Length")
 	}
+
 	return resp, nil
 }
 
@@ -102,16 +105,19 @@ func (t *Transport) redactRequest(req *http.Request) (*http.Request, *obscura.Va
 
 	original, err := io.ReadAll(req.Body)
 	_ = req.Body.Close()
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("obscura/transport: reading request body: %w", err)
 	}
 
 	sess := t.scrubber.NewSession()
+
 	redacted, err := redactJSONBody(original, t.fields, sess)
 	if err != nil {
 		if t.failOpen {
 			return cloneWithBody(req, original), nil, nil
 		}
+
 		return nil, nil, fmt.Errorf("%w: %w", ErrRedactionFailed, err)
 	}
 
@@ -127,6 +133,7 @@ func cloneWithBody(req *http.Request, body []byte) *http.Request {
 	clone.GetBody = func() (io.ReadCloser, error) {
 		return io.NopCloser(bytes.NewReader(body)), nil
 	}
+
 	return clone
 }
 

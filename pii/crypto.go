@@ -26,6 +26,7 @@ func (Crypto) Name() string { return "pii:crypto" }
 func (Crypto) Detect(text string) []obscura.Match {
 	matches := findMatches(ethRegex, text, obscura.KindCrypto, 0.85, "pii:eth")
 	matches = append(matches, findMatches(btcRegex, text, obscura.KindCrypto, 0.8, "pii:btc")...)
+
 	return matches
 }
 

@@ -45,6 +45,7 @@ func (Detector) Name() string { return "injection" }
 // Detect returns spans matching known injection heuristics.
 func (Detector) Detect(text string) []obscura.Match {
 	var matches []obscura.Match
+
 	for _, p := range patterns {
 		for _, loc := range p.re.FindAllStringIndex(text, -1) {
 			matches = append(matches, obscura.Match{
@@ -57,6 +58,7 @@ func (Detector) Detect(text string) []obscura.Match {
 			})
 		}
 	}
+
 	return matches
 }
 

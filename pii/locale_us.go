@@ -23,6 +23,6 @@ func usRules() []localeRule {
 	return []localeRule{
 		{locale: LocaleUS, kind: obscura.KindGovID, rule: "pii:ssn", re: ssnRegex, score: 0.7},
 		{locale: LocaleUS, kind: obscura.KindRouting, rule: "pii:aba", re: abaRegex, score: 0.55, validate: validABA},
-		{locale: LocaleUS, kind: obscura.KindPhone, rule: "pii:phone", re: usPhoneRegex, score: 0.6},
+		{locale: LocaleUS, kind: obscura.KindPhone, rule: rulePhone, re: usPhoneRegex, score: 0.6},
 	}
 }

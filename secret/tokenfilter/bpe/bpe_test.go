@@ -54,5 +54,6 @@ func charsPerToken(enc *bpe.Encoder, s string) float64 {
 	if n == 0 {
 		return 0
 	}
+
 	return float64(len([]rune(s))) / float64(n)
 }

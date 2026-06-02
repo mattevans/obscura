@@ -34,7 +34,7 @@ func auRules() []localeRule {
 			locale: LocaleAU, kind: obscura.KindRouting, rule: "pii:bsb", re: bsbRegex, score: 0.6,
 			requireCue: true, cues: []string{"bsb"},
 		},
-		{locale: LocaleAU, kind: obscura.KindPhone, rule: "pii:phone", re: auPhoneRegex, score: phoneScore},
-		{locale: LocaleAU, kind: obscura.KindPhone, rule: "pii:phone", re: auMobileRegex, score: phoneScore},
+		{locale: LocaleAU, kind: obscura.KindPhone, rule: rulePhone, re: auPhoneRegex, score: phoneScore},
+		{locale: LocaleAU, kind: obscura.KindPhone, rule: rulePhone, re: auMobileRegex, score: phoneScore},
 	}
 }

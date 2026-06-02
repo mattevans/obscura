@@ -71,6 +71,7 @@ func newAllowFilter(values []string) Filter {
 	for _, v := range values {
 		set[v] = struct{}{}
 	}
+
 	return allowFilter{values: set}
 }
 
@@ -79,10 +80,11 @@ func newDenyFilter(values []string) Filter {
 	for _, v := range values {
 		set[v] = struct{}{}
 	}
+
 	return denyFilter{values: set}
 }
 
-func newMinScoreFilter(min float64) Filter { return minScoreFilter{min: min} }
+func newMinScoreFilter(minScore float64) Filter { return minScoreFilter{min: minScore} }
 
 // Name identifies the filter for audit and debugging.
 func (entropyFilter) Name() string { return "secret:entropy" }
@@ -92,9 +94,11 @@ func (f entropyFilter) Apply(m Match, _ FilterContext) (float64, bool) {
 	if m.Kind != KindSecret || f.minBits <= 0 {
 		return m.Score, true
 	}
+
 	if shannonBits(m.Value) < f.minBits {
 		return 0, false
 	}
+
 	return m.Score, true
 }
 
@@ -107,16 +111,20 @@ func (f contextKeywordFilter) Apply(m Match, fc FilterContext) (float64, bool) {
 	if !f.appliesTo[m.Kind] {
 		return m.Score, true
 	}
+
 	cues := f.cues[m.Kind]
 	if len(cues) == 0 {
 		return m.Score, true
 	}
+
 	if f.hasCueNearby(fc.Text, m, cues) {
 		return clamp01(m.Score + 0.2), true
 	}
+
 	if f.vetoNoCue {
 		return 0, false
 	}
+
 	return m.Score, true
 }
 
@@ -128,6 +136,7 @@ func (f allowFilter) Apply(m Match, _ FilterContext) (float64, bool) {
 	if _, ok := f.values[m.Value]; ok {
 		return 0, false
 	}
+
 	return m.Score, true
 }
 
@@ -139,6 +148,7 @@ func (f denyFilter) Apply(m Match, _ FilterContext) (float64, bool) {
 	if _, ok := f.values[m.Value]; ok {
 		return 1, true
 	}
+
 	return m.Score, true
 }
 
@@ -150,6 +160,7 @@ func (f minScoreFilter) Apply(m Match, _ FilterContext) (float64, bool) {
 	if m.Score < f.min {
 		return m.Score, false
 	}
+
 	return m.Score, true
 }
 
@@ -158,12 +169,14 @@ func (f minScoreFilter) Apply(m Match, _ FilterContext) (float64, bool) {
 func (f contextKeywordFilter) hasCueNearby(text string, m Match, cues []string) bool {
 	lo := max(m.Start-f.window, 0)
 	hi := min(m.End+f.window, len(text))
+
 	window := strings.ToLower(text[lo:hi])
 	for _, cue := range cues {
 		if strings.Contains(window, cue) {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -184,19 +197,25 @@ func shannonBits(s string) float64 {
 	if s == "" {
 		return 0
 	}
+
 	var freq [256]int
 	for i := 0; i < len(s); i++ {
 		freq[s[i]]++
 	}
+
 	n := float64(len(s))
+
 	var bits float64
+
 	for _, c := range freq {
 		if c == 0 {
 			continue
 		}
+
 		p := float64(c) / n
 		bits -= p * math.Log2(p)
 	}
+
 	return bits
 }
 
@@ -205,8 +224,10 @@ func clamp01(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
+
 	if x > 1 {
 		return 1
 	}
+
 	return x
 }

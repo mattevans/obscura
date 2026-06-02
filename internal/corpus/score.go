@@ -20,6 +20,7 @@ func (c Counts) Precision() float64 {
 	if c.TP+c.FP == 0 {
 		return 1
 	}
+
 	return float64(c.TP) / float64(c.TP+c.FP)
 }
 
@@ -29,6 +30,7 @@ func (c Counts) Recall() float64 {
 	if c.TP+c.FN == 0 {
 		return 1
 	}
+
 	return float64(c.TP) / float64(c.TP+c.FN)
 }
 
@@ -38,6 +40,7 @@ func (c Counts) F1() float64 {
 	if p+r == 0 {
 		return 0
 	}
+
 	return 2 * p * r / (p + r)
 }
 
@@ -67,12 +70,14 @@ func (r *Result) kindCounts(kind obscura.Kind) *Counts {
 		c = &Counts{}
 		r.ByKind[kind] = c
 	}
+
 	return c
 }
 
 // add folds another Result into this one.
 func (r *Result) add(o *Result) {
 	r.Overall.add(o.Overall)
+
 	for kind, c := range o.ByKind {
 		r.kindCounts(kind).add(*c)
 	}
@@ -88,21 +93,27 @@ func Score(gold, predicted []Span, exact bool) *Result {
 	// Stable ordering makes greedy matching deterministic.
 	g := append([]Span(nil), gold...)
 	p := append([]Span(nil), predicted...)
+
 	sort.Slice(g, func(i, j int) bool { return g[i].Start < g[j].Start })
 	sort.Slice(p, func(i, j int) bool { return p[i].Start < p[j].Start })
 
 	matched := make([]bool, len(p))
+
 	for _, gs := range g {
 		hit := -1
+
 		for i, ps := range p {
 			if matched[i] || ps.Kind != gs.Kind {
 				continue
 			}
+
 			if (exact && ps.Start == gs.Start && ps.End == gs.End) || (!exact && overlaps(gs, ps)) {
 				hit = i
+
 				break
 			}
 		}
+
 		if hit >= 0 {
 			matched[hit] = true
 			res.Overall.TP++
@@ -117,6 +128,7 @@ func Score(gold, predicted []Span, exact bool) *Result {
 		if matched[i] {
 			continue
 		}
+
 		res.Overall.FP++
 		res.kindCounts(ps.Kind).FP++
 	}
@@ -131,6 +143,7 @@ func ScoreDocs(docs []Doc, exact bool, detect func(text string) []Span) *Result 
 	for _, doc := range docs {
 		total.add(Score(doc.Spans, detect(doc.Text), exact))
 	}
+
 	return total
 }
 
@@ -144,10 +157,12 @@ func MatchesToSpans(matches []obscura.Match) []Span {
 	if len(matches) == 0 {
 		return nil
 	}
+
 	out := make([]Span, 0, len(matches))
 	for _, m := range matches {
 		out = append(out, Span{Kind: m.Kind, Start: m.Start, End: m.End, Value: m.Value})
 	}
+
 	return out
 }
 

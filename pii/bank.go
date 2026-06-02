@@ -16,6 +16,7 @@ type Bank struct {
 // recognised; pass WithLocales to narrow the domestic codes.
 func NewBank(opts ...Option) obscura.Detector {
 	rules := rulesForKinds(obscura.KindIBAN, obscura.KindRouting)
+
 	return Bank{rules: selectRules(rules, newLocaleConfig(opts))}
 }
 

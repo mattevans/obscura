@@ -37,6 +37,7 @@ func findMatches(re *regexp.Regexp, text string, kind obscura.Kind, score float6
 	if len(locs) == 0 {
 		return nil
 	}
+
 	out := make([]obscura.Match, 0, len(locs))
 	for _, loc := range locs {
 		out = append(out, obscura.Match{
@@ -48,5 +49,6 @@ func findMatches(re *regexp.Regexp, text string, kind obscura.Kind, score float6
 			Rule:  rule,
 		})
 	}
+
 	return out
 }

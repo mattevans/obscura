@@ -28,6 +28,7 @@ func accuracyScrubber() *obscura.Scrubber {
 // under the relaxed (overlap) matching criterion.
 func scoreCorpus(t *testing.T, s *obscura.Scrubber) (*corpus.Result, []corpus.Doc) {
 	t.Helper()
+
 	docs, err := corpus.Load()
 	require.NoError(t, err)
 	require.NotEmpty(t, docs)
@@ -35,6 +36,7 @@ func scoreCorpus(t *testing.T, s *obscura.Scrubber) (*corpus.Result, []corpus.Do
 	res := corpus.ScoreDocs(docs, false, func(text string) []corpus.Span {
 		return corpus.MatchesToSpans(s.Findings(text))
 	})
+
 	return res, docs
 }
 
@@ -48,14 +50,17 @@ func TestAccuracyReport(t *testing.T) {
 
 	kinds := append([]obscura.Kind(nil), corpus.Kinds()...)
 	slices.Sort(kinds)
+
 	for _, k := range kinds {
 		c, ok := res.ByKind[k]
 		if !ok {
 			continue
 		}
+
 		t.Logf("%-14s %5d %5d %5d  %7.1f%% %6.1f%% %5.2f",
 			k, c.TP, c.FP, c.FN, 100*c.Precision(), 100*c.Recall(), c.F1())
 	}
+
 	o := res.Overall
 	t.Logf("%-14s %5d %5d %5d  %7.1f%% %6.1f%% %5.2f",
 		"OVERALL", o.TP, o.FP, o.FN, 100*o.Precision(), 100*o.Recall(), o.F1())
@@ -99,6 +104,7 @@ func TestAccuracyFloor(t *testing.T) {
 		if !ok {
 			continue
 		}
+
 		require.GreaterOrEqualf(t, c.Recall(), floor,
 			"%s recall %.3f below floor %.2f (TP=%d FP=%d FN=%d)",
 			k, c.Recall(), floor, c.TP, c.FP, c.FN)

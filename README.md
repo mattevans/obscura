@@ -3,7 +3,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/mattevans/obscura.svg)](https://pkg.go.dev/github.com/mattevans/obscura)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mattevans/obscura)](https://goreportcard.com/report/github.com/mattevans/obscura)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Go 1.23+](https://img.shields.io/badge/Go-1.23%2B-00ADD8.svg)
+![Go 1.26+](https://img.shields.io/badge/Go-1.26%2B-00ADD8.svg)
 
 Detect and **reversibly redact** PII, secrets, and prompt-injection patterns from text
 *before* it leaves your process for an LLM — then restore the originals in the model's
@@ -49,7 +49,7 @@ backend needs, and it lived only inside closed SaaS proxies. obscura is that pie
 go get github.com/mattevans/obscura
 ```
 
-Requires Go 1.23+.
+Requires Go 1.26+.
 
 ## Quick start
 

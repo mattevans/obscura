@@ -1,6 +1,9 @@
 package pii
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 // This file holds the checksum validators for structured PII identifiers. They live in the pii
 // package (rather than the root) because each locale rule in locale.go names the validator it
@@ -15,6 +18,7 @@ func digitsOnly(s string) []int {
 			out = append(out, int(c-'0'))
 		}
 	}
+
 	return out
 }
 
@@ -24,22 +28,27 @@ func validLuhn(s string) bool {
 	sum := 0
 	alt := false
 	count := 0
+
 	for i := len(s) - 1; i >= 0; i-- {
 		c := s[i]
 		if c < '0' || c > '9' {
 			continue
 		}
+
 		d := int(c - '0')
 		count++
+
 		if alt {
 			d *= 2
 			if d > 9 {
 				d -= 9
 			}
 		}
+
 		sum += d
 		alt = !alt
 	}
+
 	return count > 0 && sum%10 == 0
 }
 
@@ -47,32 +56,38 @@ func validLuhn(s string) bool {
 func validIBAN(s string) bool {
 	var b strings.Builder
 	b.Grow(len(s))
+
 	for i := 0; i < len(s); i++ {
 		c := s[i]
 		if c == ' ' || c == '-' {
 			continue
 		}
+
 		b.WriteByte(c)
 	}
+
 	iban := strings.ToUpper(b.String())
 	if len(iban) < 15 || len(iban) > 34 {
 		return false
 	}
 	// Move the first four characters to the end, then convert letters to numbers (A=10..Z=35).
 	rearranged := iban[4:] + iban[:4]
+
 	var digits strings.Builder
 	digits.Grow(len(rearranged) * 2)
+
 	for i := 0; i < len(rearranged); i++ {
 		c := rearranged[i]
 		switch {
 		case c >= '0' && c <= '9':
 			digits.WriteByte(c)
 		case c >= 'A' && c <= 'Z':
-			digits.WriteString(itoaByte(int(c-'A') + 10))
+			digits.WriteString(strconv.Itoa(int(c-'A') + 10))
 		default:
 			return false
 		}
 	}
+
 	return mod97(digits.String()) == 1
 }
 
@@ -82,7 +97,9 @@ func validABA(s string) bool {
 	if len(d) != 9 {
 		return false
 	}
+
 	sum := 3*(d[0]+d[3]+d[6]) + 7*(d[1]+d[4]+d[7]) + (d[2] + d[5] + d[8])
+
 	return sum%10 == 0
 }
 
@@ -93,11 +110,14 @@ func validTFN(s string) bool {
 	if len(d) != 9 {
 		return false
 	}
+
 	weights := [9]int{1, 4, 3, 7, 5, 8, 6, 9, 10}
+
 	sum := 0
 	for i := range 9 {
 		sum += d[i] * weights[i]
 	}
+
 	return sum%11 == 0
 }
 
@@ -109,11 +129,14 @@ func validABN(s string) bool {
 	if len(d) != 11 {
 		return false
 	}
+
 	weights := [11]int{10, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19}
+
 	sum := (d[0] - 1) * weights[0]
 	for i := 1; i < 11; i++ {
 		sum += d[i] * weights[i]
 	}
+
 	return sum%89 == 0
 }
 
@@ -125,7 +148,9 @@ func validNZBN(s string) bool {
 	if len(d) != 13 {
 		return false
 	}
+
 	sum := 0
+
 	for i := range 12 {
 		if i%2 == 0 {
 			sum += d[i]
@@ -133,7 +158,9 @@ func validNZBN(s string) bool {
 			sum += d[i] * 3
 		}
 	}
+
 	check := (10 - sum%10) % 10
+
 	return check == d[12]
 }
 
@@ -146,13 +173,16 @@ func validIRD(s string) bool {
 	if len(d) < 8 || len(d) > 9 {
 		return false
 	}
+
 	n := 0
 	for _, x := range d {
 		n = n*10 + x
 	}
+
 	if n < 10_000_000 || n > 150_000_000 {
 		return false
 	}
+
 	check := d[len(d)-1]
 	base := d[:len(d)-1]
 	// Left-pad the base to eight digits so the weights line up regardless of an 8- or 9-digit IRD.
@@ -166,6 +196,7 @@ func validIRD(s string) bool {
 			return false
 		}
 	}
+
 	return c == check
 }
 
@@ -176,9 +207,11 @@ func irdCheckDigit(base [8]int, weights [8]int) int {
 	for i := range 8 {
 		sum += base[i] * weights[i]
 	}
+
 	if r := sum % 11; r != 0 {
 		return 11 - r
 	}
+
 	return 0
 }
 
@@ -188,13 +221,6 @@ func mod97(digits string) int {
 	for i := 0; i < len(digits); i++ {
 		rem = (rem*10 + int(digits[i]-'0')) % 97
 	}
-	return rem
-}
 
-// itoaByte renders a small non-negative int (10..35) as decimal digits.
-func itoaByte(n int) string {
-	if n < 10 {
-		return string(rune('0' + n))
-	}
-	return string(rune('0'+n/10)) + string(rune('0'+n%10))
+	return rem
 }

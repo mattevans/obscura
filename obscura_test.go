@@ -14,8 +14,12 @@ import (
 
 func newTestScrubber(t *testing.T, opts ...obscura.Option) *obscura.Scrubber {
 	t.Helper()
-	base := []obscura.Option{obscura.WithDetectors(pii.All()...)}
-	return obscura.New(append(base, opts...)...)
+
+	base := make([]obscura.Option, 0, 1+len(opts))
+	base = append(base, obscura.WithDetectors(pii.All()...))
+	base = append(base, opts...)
+
+	return obscura.New(base...)
 }
 
 func TestBusinessIDAndOverlapResolution(t *testing.T) {
@@ -108,6 +112,7 @@ func TestRedactRestoreRoundTrip(t *testing.T) {
 			for _, ph := range tt.wantPH {
 				assert.Contains(t, clean, ph, "expected placeholder in redacted text")
 			}
+
 			for _, orig := range tt.notSeen {
 				assert.NotContains(t, clean, orig, "original PII leaked into redacted text")
 			}
@@ -189,6 +194,7 @@ func FuzzRoundTrip(f *testing.F) {
 	}
 
 	s := obscura.New(obscura.WithDetectors(pii.All()...))
+
 	f.Fuzz(func(t *testing.T, input string) {
 		clean, vault := s.Redact(input)
 		require.Equal(t, input, vault.Restore(clean), "restore must reconstruct the original")
@@ -200,15 +206,19 @@ func FuzzRoundTrip(f *testing.F) {
 
 func TestScrubberConcurrentUse(t *testing.T) {
 	s := newTestScrubber(t)
+
 	const goroutines = 16
+
 	wg := make(chan struct{}, goroutines)
 	for range goroutines {
 		go func() {
 			defer func() { wg <- struct{}{} }()
+
 			clean, vault := s.Redact("email a@b.com here")
 			assert.Equal(t, "email a@b.com here", vault.Restore(clean))
 		}()
 	}
+
 	for range goroutines {
 		<-wg
 	}
@@ -224,6 +234,7 @@ func TestASCIIPlaceholderStyle(t *testing.T) {
 func TestNoLeakInClean(t *testing.T) {
 	s := newTestScrubber(t)
 	input := "reach jane.doe@example.com or 4111 1111 1111 1111"
+
 	clean, _ := s.Redact(input)
 	for _, orig := range []string{"jane.doe@example.com", "4111 1111 1111 1111"} {
 		assert.False(t, strings.Contains(clean, orig), "original %q leaked", orig)

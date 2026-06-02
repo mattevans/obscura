@@ -20,6 +20,7 @@ func (s *Scrubber) NewSession() *Session {
 // cleaned text. It runs only synchronous Detectors.
 func (sess *Session) Redact(text string) string {
 	matches := sess.s.resolve(text, sess.s.detect(text))
+
 	return sess.s.rewriteInto(text, matches, sess.v)
 }
 

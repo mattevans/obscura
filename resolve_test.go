@@ -50,6 +50,7 @@ func TestResolveOverlapsDeterministic(t *testing.T) {
 		{Kind: KindPhone, Start: 3, End: 9, Score: 0.9},
 		{Kind: KindEmail, Start: 8, End: 12, Score: 0.9},
 	}
+
 	first := resolveOverlaps(matches, prio)
 	for range 10 {
 		assert.Equal(t, first, resolveOverlaps(matches, prio))

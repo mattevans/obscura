@@ -33,6 +33,7 @@ func TestLocaleRuleInvariants(t *testing.T) {
 		assert.NotNilf(t, r.re, "rule %q is missing its regexp", r.rule)
 		assert.Greaterf(t, r.score, 0.0, "rule %q score must be positive", r.rule)
 		assert.LessOrEqualf(t, r.score, 1.0, "rule %q score must not exceed 1", r.rule)
+
 		if r.requireCue {
 			assert.NotEmptyf(t, r.cues, "cue-gated rule %q must list at least one cue", r.rule)
 		}
@@ -47,12 +48,14 @@ func TestLocaleRuleInvariants(t *testing.T) {
 func TestRulesForKindsFilters(t *testing.T) {
 	gov := rulesForKinds(obscura.KindGovID)
 	require.NotEmpty(t, gov)
+
 	for _, r := range gov {
 		assert.Equal(t, obscura.KindGovID, r.kind)
 	}
 
 	bank := rulesForKinds(obscura.KindIBAN, obscura.KindRouting)
 	require.NotEmpty(t, bank)
+
 	for _, r := range bank {
 		assert.Contains(t, []obscura.Kind{obscura.KindIBAN, obscura.KindRouting}, r.kind)
 	}

@@ -34,6 +34,7 @@ func TestRestoreStreamerMatchesOneShot(t *testing.T) {
 			// (including mid-placeholder and mid-rune for the Unicode delimiter).
 			for i := 0; i <= len(clean); i++ {
 				st := vault.NewRestoreStreamer()
+
 				var got strings.Builder
 				got.WriteString(st.Push(clean[:i]))
 				got.WriteString(st.Push(clean[i:]))
@@ -50,10 +51,12 @@ func TestRestoreStreamerByteByByte(t *testing.T) {
 	want := vault.Restore(clean)
 
 	st := vault.NewRestoreStreamer()
+
 	var got strings.Builder
 	for i := 0; i < len(clean); i++ {
 		got.WriteString(st.Push(clean[i : i+1]))
 	}
+
 	got.WriteString(st.Flush())
 	assert.Equal(t, want, got.String())
 }
@@ -88,6 +91,7 @@ func FuzzStreamingRestore(f *testing.F) {
 	f.Add("card 4111 1111 1111 1111", 3)
 
 	s := obscura.New(obscura.WithDetectors(pii.All()...))
+
 	f.Fuzz(func(t *testing.T, input string, cut int) {
 		clean, vault := s.Redact(input)
 		want := vault.Restore(clean)
@@ -102,6 +106,7 @@ func FuzzStreamingRestore(f *testing.F) {
 		}
 
 		st := vault.NewRestoreStreamer()
+
 		var got strings.Builder
 		got.WriteString(st.Push(clean[:cut]))
 		got.WriteString(st.Push(clean[cut:]))

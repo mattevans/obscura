@@ -51,6 +51,7 @@ func New(opts ...Option) *Scrubber {
 // the synchronous Detectors (not ContextDetectors), is pure CPU, and never errors.
 func (s *Scrubber) Redact(text string) (string, *Vault) {
 	matches := s.resolve(text, s.detect(text))
+
 	return s.rewrite(text, matches)
 }
 
@@ -63,10 +64,12 @@ func (s *Scrubber) RedactContext(ctx context.Context, text string) (string, *Vau
 	if err != nil {
 		return "", nil, err
 	}
+
 	matches = append(matches, ctxMatches...)
 
 	resolved := s.resolve(text, matches)
 	clean, v := s.rewrite(text, resolved)
+
 	return clean, v, nil
 }
 
@@ -78,10 +81,11 @@ func (s *Scrubber) Findings(text string) []Match {
 
 // detect runs every synchronous Detector over text and concatenates their candidate matches.
 func (s *Scrubber) detect(text string) []Match {
-	var matches []Match
+	matches := make([]Match, 0, len(s.detectors))
 	for _, d := range s.detectors {
 		matches = append(matches, d.Detect(text)...)
 	}
+
 	return matches
 }
 
@@ -92,6 +96,7 @@ func (s *Scrubber) detectContext(ctx context.Context, text string) ([]Match, err
 	if len(s.ctxDet) == 0 {
 		return nil, nil
 	}
+
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -101,20 +106,27 @@ func (s *Scrubber) detectContext(ctx context.Context, text string) ([]Match, err
 
 	results := make([][]Match, len(s.ctxDet))
 	errs := make([]error, len(s.ctxDet))
+
 	var wg sync.WaitGroup
 	wg.Add(len(s.ctxDet))
+
 	for i, d := range s.ctxDet {
 		go func() {
 			defer wg.Done()
+
 			ms, err := d.DetectContext(cctx, text)
 			if err != nil {
 				errs[i] = fmt.Errorf("obscura: detector %q: %w", d.Name(), err)
+
 				cancel() // signal siblings to stop on the first failure
+
 				return
 			}
+
 			results[i] = ms
 		}()
 	}
+
 	wg.Wait()
 
 	for _, err := range errs {
@@ -127,6 +139,7 @@ func (s *Scrubber) detectContext(ctx context.Context, text string) ([]Match, err
 	for _, ms := range results {
 		merged = append(merged, ms...)
 	}
+
 	return merged, nil
 }
 
@@ -134,12 +147,14 @@ func (s *Scrubber) detectContext(ctx context.Context, text string) ([]Match, err
 // deterministic, non-overlapping set sorted by start offset.
 func (s *Scrubber) resolve(text string, candidates []Match) []Match {
 	fc := FilterContext{Text: text}
+
 	kept := make([]Match, 0, len(candidates))
 	for _, m := range candidates {
 		if filtered, ok := s.applyFilters(m, fc); ok {
 			kept = append(kept, filtered)
 		}
 	}
+
 	return resolveOverlaps(kept, s.policy.priority)
 }
 
@@ -151,8 +166,10 @@ func (s *Scrubber) applyFilters(m Match, fc FilterContext) (Match, bool) {
 		if !keep {
 			return Match{}, false
 		}
+
 		m.Score = score
 	}
+
 	return m, true
 }
 
@@ -160,6 +177,7 @@ func (s *Scrubber) applyFilters(m Match, fc FilterContext) (Match, bool) {
 // a fresh Vault, returning the sanitized text.
 func (s *Scrubber) rewrite(text string, matches []Match) (string, *Vault) {
 	v := newVault(s.policy.style)
+
 	return s.rewriteInto(text, matches, v), v
 }
 
@@ -173,16 +191,20 @@ func (s *Scrubber) rewriteInto(text string, matches []Match, v *Vault) string {
 
 	var b strings.Builder
 	b.Grow(len(text))
+
 	pos := 0
 	for _, m := range matches {
 		if m.Start < pos || m.End > len(text) {
 			continue // defensive: skip any malformed span.
 		}
+
 		b.WriteString(text[pos:m.Start])
 		b.WriteString(v.placeholderFor(m.Kind, m.Value))
 		pos = m.End
 	}
+
 	b.WriteString(text[pos:])
+
 	return b.String()
 }
 
@@ -195,12 +217,16 @@ func buildFilterChain(cfg *config) []Filter {
 	if len(cfg.allow) > 0 {
 		chain = append(chain, newAllowFilter(cfg.allow))
 	}
+
 	chain = append(chain, detectorFilters(cfg.detectors)...)
+
 	chain = append(chain, cfg.filters...)
 	if len(cfg.deny) > 0 {
 		chain = append(chain, newDenyFilter(cfg.deny))
 	}
+
 	chain = append(chain, newMinScoreFilter(cfg.minScore))
+
 	return chain
 }
 
@@ -208,20 +234,26 @@ func buildFilterChain(cfg *config) []Filter {
 // filterProvider, deduplicated by name and ordered deterministically for reproducibility.
 func detectorFilters(detectors []Detector) []Filter {
 	seen := make(map[string]struct{}, len(detectors))
+
 	var out []Filter
+
 	for _, d := range detectors {
 		fp, ok := d.(filterProvider)
 		if !ok {
 			continue
 		}
+
 		for _, f := range fp.DefaultFilters() {
 			if _, dup := seen[f.Name()]; dup {
 				continue
 			}
+
 			seen[f.Name()] = struct{}{}
 			out = append(out, f)
 		}
 	}
+
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Name() < out[j].Name() })
+
 	return out
 }
